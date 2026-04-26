@@ -1,0 +1,586 @@
+
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>博馨診所｜益菌領取簽收系統 正式版</title>
+  <style>
+    :root{
+      --bg:#f5f7fb;
+      --bg2:#eef4ff;
+      --card:#ffffff;
+      --line:#dfe7f3;
+      --text:#1f2a37;
+      --muted:#64748b;
+      --primary:#2563eb;
+      --primary2:#4f46e5;
+      --accent:#ec4899;
+      --green:#059669;
+      --amber:#d97706;
+      --danger:#dc2626;
+      --shadow:0 12px 32px rgba(15,23,42,.08);
+      --radius:22px;
+    }
+    *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+    body{
+      margin:0;
+      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Noto Sans TC",sans-serif;
+      color:var(--text);
+      background:linear-gradient(180deg,#f9fbff, var(--bg) 35%, #eef4ff);
+      min-height:100vh;
+    }
+    .app{width:min(1180px,calc(100% - 24px));margin:16px auto 36px;}
+    .hero{
+      position:relative;overflow:hidden;margin-bottom:16px;
+      background:linear-gradient(135deg,#1d4ed8 0%, #4f46e5 45%, #0ea5e9 100%);
+      color:#fff;border-radius:30px;padding:24px 20px;box-shadow:0 18px 42px rgba(37,99,235,.24);
+    }
+    .hero::before,.hero::after{content:"";position:absolute;border-radius:999px;opacity:.18;background:#fff}
+    .hero::before{width:180px;height:180px;top:-40px;right:-20px}
+    .hero::after{width:130px;height:130px;bottom:-35px;left:20px}
+    .hero-top{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;position:relative;z-index:1;flex-wrap:wrap}
+    .hero h1{margin:10px 0 6px;font-size:30px;line-height:1.15}
+    .hero p{margin:0;color:rgba(255,255,255,.9)}
+    .badge{display:inline-flex;align-items:center;gap:8px;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.12);padding:9px 14px;border-radius:999px;font-size:13px;font-weight:800}
+    .hero-actions{display:flex;gap:10px;flex-wrap:wrap}
+
+    .btn{border:none;border-radius:16px;padding:13px 16px;font-size:15px;font-weight:800;cursor:pointer;transition:.15s transform,.18s opacity,.18s box-shadow;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;gap:8px}
+    .btn:active{transform:scale(.98)}
+    .btn-primary{background:linear-gradient(135deg,var(--primary),var(--primary2));color:#fff;box-shadow:0 10px 24px rgba(37,99,235,.22)}
+    .btn-secondary{background:#fff;color:#1d4ed8}
+    .btn-soft{background:#fff;border:1px solid var(--line);color:#334155}
+    .btn-pink{background:linear-gradient(135deg,#ec4899,#fb7185);color:#fff;box-shadow:0 10px 24px rgba(236,72,153,.18)}
+    .btn-green{background:linear-gradient(135deg,#059669,#10b981);color:#fff;box-shadow:0 10px 24px rgba(5,150,105,.18)}
+    .btn-danger{background:linear-gradient(135deg,#dc2626,#ef4444);color:#fff;box-shadow:0 10px 24px rgba(220,38,38,.18)}
+    .btn-chip{padding:10px 14px;border-radius:999px;background:#f8fafc;border:1px solid var(--line);color:#475569}
+    .btn-chip.active{background:linear-gradient(135deg,#2563eb,#4f46e5);color:#fff;border-color:transparent}
+
+    .toolbar{display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap;margin-bottom:16px}
+    .toolbar-left,.toolbar-right{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+    .status-pill{display:inline-flex;align-items:center;gap:8px;padding:9px 13px;border-radius:999px;font-size:13px;font-weight:800;background:#fff;border:1px solid var(--line);box-shadow:var(--shadow)}
+    .dot{width:10px;height:10px;border-radius:999px;background:#94a3b8}
+    .dot.ok{background:#10b981}.dot.warn{background:#f59e0b}.dot.bad{background:#ef4444}
+
+    .layout{display:grid;grid-template-columns:1.3fr .9fr;gap:16px}
+    @media (max-width:980px){.layout{grid-template-columns:1fr}}
+
+    .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:18px}
+    .section-head{display:flex;justify-content:space-between;gap:8px;align-items:center;margin-bottom:14px;flex-wrap:wrap}
+    .section-head h2,.section-head h3{margin:0;font-size:19px}
+    .muted{color:var(--muted)}
+    .small{font-size:12px}
+
+    .grid-2,.grid-3{display:grid;gap:12px}
+    .grid-2{grid-template-columns:1fr 1fr}
+    .grid-3{grid-template-columns:repeat(3,1fr)}
+    @media (max-width:700px){.grid-2,.grid-3{grid-template-columns:1fr}}
+
+    label{display:block;font-size:13px;font-weight:800;color:#475569;margin-bottom:8px}
+    input,textarea,select{
+      width:100%;border:1.5px solid var(--line);background:#fff;border-radius:16px;padding:14px 14px;font-size:16px;color:var(--text);outline:none;transition:.18s border,.18s box-shadow;
+    }
+    input:focus,textarea:focus,select:focus{border-color:#60a5fa;box-shadow:0 0 0 4px rgba(96,165,250,.14)}
+    textarea{min-height:92px;resize:vertical}
+
+    .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:8px 0 16px}
+    @media (max-width:800px){.stats{grid-template-columns:repeat(2,1fr)}}
+    .stat{border-radius:20px;padding:16px;color:#fff;min-height:95px;display:flex;flex-direction:column;justify-content:space-between}
+    .stat:nth-child(1){background:linear-gradient(135deg,#2563eb,#3b82f6)}
+    .stat:nth-child(2){background:linear-gradient(135deg,#7c3aed,#6366f1)}
+    .stat:nth-child(3){background:linear-gradient(135deg,#059669,#10b981)}
+    .stat:nth-child(4){background:linear-gradient(135deg,#db2777,#fb7185)}
+    .stat .k{font-size:13px;opacity:.9}
+    .stat .v{font-size:28px;font-weight:900}
+
+    .row-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+    .patient-list{display:flex;flex-direction:column;gap:10px;max-height:520px;overflow:auto;padding-right:2px}
+    .patient-item{border:1px solid var(--line);border-radius:18px;padding:14px;background:#fff;cursor:pointer;transition:.15s transform,.18s box-shadow,.18s border}
+    .patient-item:hover{transform:translateY(-1px);box-shadow:0 10px 20px rgba(15,23,42,.06)}
+    .patient-item.active{border-color:#60a5fa;box-shadow:0 0 0 3px rgba(96,165,250,.12)}
+    .patient-top{display:flex;justify-content:space-between;gap:8px;align-items:flex-start}
+    .patient-name{font-size:16px;font-weight:900}
+    .pill{padding:6px 10px;border-radius:999px;background:#eff6ff;color:#1d4ed8;font-size:12px;font-weight:800}
+
+    .canvas-shell{border:1.5px dashed #cbd5e1;border-radius:20px;padding:10px;background:linear-gradient(180deg,#fff,#f8fbff)}
+    canvas{width:100%;height:220px;background:#fff;border-radius:16px;display:block;touch-action:none}
+
+    .table-wrap{overflow:auto;border:1px solid var(--line);border-radius:18px;background:#fff}
+    table{width:100%;border-collapse:collapse;min-width:980px}
+    th,td{padding:13px 12px;border-bottom:1px solid #edf2f7;text-align:left;font-size:14px;vertical-align:top}
+    th{background:#f8fbff;color:#475569;font-size:13px}
+    .empty{padding:28px 16px;text-align:center;color:var(--muted)}
+    .hidden{display:none !important}
+
+    .modal-backdrop{position:fixed;inset:0;background:rgba(15,23,42,.42);display:none;align-items:center;justify-content:center;padding:16px;z-index:1000}
+    .modal-backdrop.show{display:flex}
+    .modal{width:min(760px,100%);max-height:92vh;overflow:auto;background:#fff;border-radius:24px;padding:18px;border:1px solid var(--line);box-shadow:0 24px 60px rgba(15,23,42,.24)}
+    .codebox{background:#0f172a;color:#e2e8f0;padding:14px;border-radius:16px;font-size:12px;overflow:auto;white-space:pre-wrap}
+    .callout{padding:13px 14px;border-radius:16px;border:1px solid #dbeafe;background:#f8fbff;color:#1e3a8a}
+    .foot{margin-top:14px;color:var(--muted);font-size:12px;text-align:center}
+  </style>
+</head>
+<body>
+  <div class="app">
+    <section class="hero">
+      <div class="hero-top">
+        <div>
+          <div class="badge">🏥 <span id="clinicTitle">博馨診所</span>｜益菌領取簽收系統 正式版</div>
+          <h1>單一頁面完成<br>病患管理、簽名、領取紀錄、雲端同步</h1>
+          <p>適合 iPad 直接操作。可先本機使用，再接上 Google Sheet 正式同步。</p>
+        </div>
+        <div class="hero-actions">
+          <button class="btn btn-secondary" id="openSettingsBtn">系統設定</button>
+          <button class="btn btn-secondary" id="syncNowBtn">立即同步</button>
+        </div>
+      </div>
+    </section>
+
+    <div class="toolbar">
+      <div class="toolbar-left">
+        <div class="status-pill"><span class="dot" id="syncDot"></span><span id="syncLabel">尚未設定雲端同步</span></div>
+        <div class="status-pill"><span>未同步筆數</span><strong id="pendingCount">0</strong></div>
+      </div>
+      <div class="toolbar-right">
+        <button class="btn btn-soft" id="exportJsonBtn">匯出完整備份</button>
+        <button class="btn btn-soft" id="exportCsvBtn">匯出紀錄 CSV</button>
+      </div>
+    </div>
+
+    <div class="layout">
+      <section class="card">
+        <div class="section-head">
+          <h2>病患查詢 / 新增</h2>
+          <span class="muted small">正式版：支援同步設定與待傳佇列</span>
+        </div>
+
+        <div class="grid-2">
+          <input id="searchInput" placeholder="搜尋病患姓名、電話、病歷號" />
+          <button class="btn btn-primary" id="addPatientBtn">＋ 新增病患</button>
+        </div>
+
+        <div class="stats">
+          <div class="stat"><div class="k">總盒數</div><div class="v" id="statTotal">0</div></div>
+          <div class="stat"><div class="k">已領取</div><div class="v" id="statTaken">0</div></div>
+          <div class="stat"><div class="k">剩餘盒數</div><div class="v" id="statRemain">0</div></div>
+          <div class="stat"><div class="k">病患總數</div><div class="v" id="statPatients">0</div></div>
+        </div>
+
+        <div class="grid-2">
+          <div><label>病患姓名</label><input id="patientName" placeholder="請輸入姓名" /></div>
+          <div><label>病歷號 / 編號</label><input id="patientCode" placeholder="例如 A001" /></div>
+        </div>
+
+        <div class="grid-2" style="margin-top:12px">
+          <div><label>電話</label><input id="patientPhone" placeholder="請輸入電話" /></div>
+          <div><label>總盒數</label><input id="patientTotal" type="number" min="1" step="1" value="13" /></div>
+        </div>
+
+        <div style="margin-top:12px"><label>備註</label><textarea id="patientNote" placeholder="病患備註"></textarea></div>
+
+        <div class="row-actions">
+          <button class="btn btn-primary" id="savePatientBtn">儲存病患資料</button>
+          <button class="btn btn-soft" id="resetPatientBtn">清空輸入</button>
+          <button class="btn btn-danger" id="deletePatientBtn">刪除此病患</button>
+        </div>
+
+        <div class="section-head" style="margin-top:22px">
+          <h3>本次領取與簽名</h3>
+          <span class="muted small">簽名會跟著紀錄一起保存</span>
+        </div>
+
+        <div class="grid-2">
+          <div><label>領取日期</label><input id="pickupDate" type="date" /></div>
+          <div><label>本次領取盒數</label><input id="pickupQty" type="number" min="1" step="1" value="1" /></div>
+        </div>
+
+        <div style="margin-top:12px">
+          <label>快速選擇</label>
+          <div class="row-actions" id="quickQtyBtns">
+            <button type="button" class="btn btn-chip" data-qty="1">1 盒</button>
+            <button type="button" class="btn btn-chip" data-qty="2">2 盒</button>
+            <button type="button" class="btn btn-chip" data-qty="3">3 盒</button>
+            <button type="button" class="btn btn-chip" data-qty="4">4 盒</button>
+            <button type="button" class="btn btn-chip" data-qty="5">5 盒</button>
+            <button type="button" class="btn btn-chip" data-qty="all">全領</button>
+          </div>
+        </div>
+
+        <div class="grid-2" style="margin-top:12px">
+          <div><label>簽名人</label><input id="signer" placeholder="例如：本人 / 家屬" /></div>
+          <div><label>本次備註</label><input id="pickupRemark" placeholder="本次領取備註" /></div>
+        </div>
+
+        <div style="margin-top:12px">
+          <label>病患簽名</label>
+          <div class="canvas-shell"><canvas id="signatureCanvas"></canvas></div>
+        </div>
+
+        <div class="row-actions">
+          <button class="btn btn-soft" id="clearSignBtn">清除簽名</button>
+          <button class="btn btn-green" id="savePickupBtn">確認領取並存檔</button>
+        </div>
+      </section>
+
+      <aside class="card">
+        <div class="section-head">
+          <h2>病患清單</h2>
+          <span class="muted small" id="patientCount">0 位</span>
+        </div>
+        <div class="patient-list" id="patientList"></div>
+      </aside>
+    </div>
+
+    <section class="card" style="margin-top:16px">
+      <div class="section-head">
+        <h2>病患領取紀錄</h2>
+        <div class="toolbar-right">
+          <button class="btn btn-soft" id="printPatientBtn">列印目前病患紀錄</button>
+          <button class="btn btn-danger" id="clearRecordsBtn">清空全部領取紀錄</button>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>日期</th>
+              <th>病患姓名</th>
+              <th>病歷號 / 電話</th>
+              <th>領取盒數</th>
+              <th>簽名人</th>
+              <th>備註</th>
+              <th>同步狀態</th>
+            </tr>
+          </thead>
+          <tbody id="recordsBody"></tbody>
+        </table>
+        <div class="empty" id="recordsEmpty">目前還沒有病患領取紀錄</div>
+      </div>
+      <div class="foot">此正式版可先本機使用；完成 Google Apps Script 設定後，可同步到 Google Sheet。</div>
+    </section>
+  </div>
+
+  <div class="modal-backdrop" id="settingsModal">
+    <div class="modal">
+      <div class="section-head">
+        <h2>系統設定</h2>
+        <button class="btn btn-soft" id="closeSettingsBtn">關閉</button>
+      </div>
+      <div class="grid-2">
+        <div>
+          <label>診所名稱</label>
+          <input id="clinicNameInput" placeholder="例如：博馨診所" />
+        </div>
+        <div>
+          <label>Google Apps Script 網址</label>
+          <input id="scriptUrlInput" placeholder="貼上部署後的 Web App URL" />
+        </div>
+      </div>
+      <div style="margin-top:12px">
+        <label>Google Sheet ID</label>
+        <input id="sheetIdInput" placeholder="可選填，供辨識使用" />
+      </div>
+      <div class="row-actions">
+        <button class="btn btn-primary" id="saveSettingsBtn">儲存設定</button>
+        <button class="btn btn-soft" id="testSyncBtn">測試同步</button>
+      </div>
+      <div class="callout" style="margin-top:14px">
+        正式使用方式：先在 Google 試算表建立工作表，再把 Apps Script 部署成 Web App，將網址貼在這裡。之後每次病患領取，系統會先本機存檔，再自動嘗試同步。
+      </div>
+      <div style="margin-top:14px">
+        <label>Apps Script 範例</label>
+        <div class="codebox">function doPost(e) {
+  const sheet = SpreadsheetApp.openById('你的 Google Sheet ID').getSheetByName('Records');
+  const data = JSON.parse(e.postData.contents);
+  if (data.action === 'test') {
+    return ContentService.createTextOutput(JSON.stringify({ ok: true, message: 'test ok' }))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
+  if (data.action === 'append_record') {
+    sheet.appendRow([
+      new Date(),
+      data.clinicName || '',
+      data.record.patientName || '',
+      data.record.patientCode || '',
+      data.record.patientPhone || '',
+      data.record.date || '',
+      data.record.qty || '',
+      data.record.signer || '',
+      data.record.remark || '',
+      data.record.signature || ''
+    ]);
+    return ContentService.createTextOutput(JSON.stringify({ ok: true }))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
+  return ContentService.createTextOutput(JSON.stringify({ ok: false, message: 'unknown action' }))
+    .setMimeType(ContentService.MimeType.JSON);
+}</div>
+      </div>
+    </div>
+  </div>
+
+<script>
+const $ = id => document.getElementById(id);
+const LS_PATIENTS = 'clinic_formal_patients_v1';
+const LS_RECORDS = 'clinic_formal_records_v1';
+const LS_SETTINGS = 'clinic_formal_settings_v1';
+
+let patients = load(LS_PATIENTS, []);
+let records = load(LS_RECORDS, []);
+let settings = load(LS_SETTINGS, { clinicName:'博馨診所', scriptUrl:'', sheetId:'' });
+let selectedPatientId = null;
+
+const els = {
+  searchInput:$('searchInput'), patientName:$('patientName'), patientCode:$('patientCode'), patientPhone:$('patientPhone'), patientTotal:$('patientTotal'), patientNote:$('patientNote'),
+  pickupDate:$('pickupDate'), pickupQty:$('pickupQty'), signer:$('signer'), pickupRemark:$('pickupRemark'), patientList:$('patientList'), patientCount:$('patientCount'),
+  statTotal:$('statTotal'), statTaken:$('statTaken'), statRemain:$('statRemain'), statPatients:$('statPatients'), recordsBody:$('recordsBody'), recordsEmpty:$('recordsEmpty'),
+  pendingCount:$('pendingCount'), syncDot:$('syncDot'), syncLabel:$('syncLabel'), clinicTitle:$('clinicTitle')
+};
+
+function load(key, fallback){ try { return JSON.parse(localStorage.getItem(key)) ?? fallback; } catch { return fallback; } }
+function persist(){
+  localStorage.setItem(LS_PATIENTS, JSON.stringify(patients));
+  localStorage.setItem(LS_RECORDS, JSON.stringify(records));
+  localStorage.setItem(LS_SETTINGS, JSON.stringify(settings));
+}
+function uid(){ return Date.now().toString(36)+Math.random().toString(36).slice(2,7); }
+function today(){ return new Date().toISOString().slice(0,10); }
+function escapeHtml(str){ return String(str).replace(/[&<>"']/g, s => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[s])); }
+function selectedPatient(){ return patients.find(p => p.id === selectedPatientId) || null; }
+els.pickupDate.value = today();
+
+function applySettingsToUi(){
+  els.clinicTitle.textContent = settings.clinicName || '診所';
+  $('clinicNameInput').value = settings.clinicName || '';
+  $('scriptUrlInput').value = settings.scriptUrl || '';
+  $('sheetIdInput').value = settings.sheetId || '';
+  updateSyncStatus();
+}
+
+function updateSyncStatus(){
+  const pending = records.filter(r => !r.synced).length;
+  els.pendingCount.textContent = pending;
+  const hasUrl = !!settings.scriptUrl;
+  els.syncDot.className = 'dot ' + (hasUrl ? (pending ? 'warn' : 'ok') : 'bad');
+  els.syncLabel.textContent = !hasUrl ? '尚未設定雲端同步' : (pending ? `雲端同步已設定，尚有 ${pending} 筆待同步` : '雲端同步正常');
+}
+
+function renderPatients(){
+  const q = els.searchInput.value.trim().toLowerCase();
+  const filtered = patients.filter(p => [p.name,p.code,p.phone,p.note].join(' ').toLowerCase().includes(q));
+  els.patientCount.textContent = `${filtered.length} 位`;
+  els.statPatients.textContent = patients.length;
+  if(!filtered.length){
+    els.patientList.innerHTML = '<div class="empty">目前沒有病患資料，先按「新增病患」建立資料。</div>';
+    return;
+  }
+  els.patientList.innerHTML = filtered.map(p => {
+    const remain = Math.max((p.total||0)-(p.taken||0),0);
+    return `<div class="patient-item ${p.id===selectedPatientId?'active':''}" data-id="${p.id}">
+      <div class="patient-top">
+        <div>
+          <div class="patient-name">${escapeHtml(p.name || '未命名')}</div>
+          <div class="muted small">${escapeHtml(p.code || '未填編號')} · ${escapeHtml(p.phone || '未填電話')}</div>
+        </div>
+        <span class="pill">剩餘 ${remain} 盒</span>
+      </div>
+      <div class="muted small" style="margin-top:6px">總盒數 ${p.total||0} / 已領取 ${p.taken||0}</div>
+    </div>`;
+  }).join('');
+  document.querySelectorAll('.patient-item').forEach(el => el.onclick = () => selectPatient(el.dataset.id));
+}
+
+function renderStats(){
+  const p = selectedPatient();
+  const total = p?.total || 0; const taken = p?.taken || 0; const remain = Math.max(total-taken,0);
+  els.statTotal.textContent = total; els.statTaken.textContent = taken; els.statRemain.textContent = remain;
+}
+
+function renderRecords(){
+  const sorted = [...records].sort((a,b)=>(b.createdAt||'').localeCompare(a.createdAt||''));
+  els.recordsBody.innerHTML = sorted.map(r => `<tr>
+    <td>${escapeHtml(r.date || '')}</td>
+    <td><strong>${escapeHtml(r.patientName || '')}</strong></td>
+    <td>${escapeHtml(r.patientCode || '')}<br><span class="small muted">${escapeHtml(r.patientPhone || '')}</span></td>
+    <td>${escapeHtml(String(r.qty || 0))} 盒</td>
+    <td>${escapeHtml(r.signer || '')}</td>
+    <td>${escapeHtml(r.remark || '')}</td>
+    <td>${r.synced ? '<span class="pill" style="background:#ecfdf5;color:#047857">已同步</span>' : '<span class="pill" style="background:#fff7ed;color:#c2410c">待同步</span>'}</td>
+  </tr>`).join('');
+  els.recordsEmpty.classList.toggle('hidden', sorted.length > 0);
+  updateSyncStatus();
+}
+
+function clearPatientForm(){ els.patientName.value=''; els.patientCode.value=''; els.patientPhone.value=''; els.patientTotal.value='13'; els.patientNote.value=''; }
+
+function selectPatient(id){
+  selectedPatientId = id;
+  const p = selectedPatient();
+  if(!p) return;
+  els.patientName.value = p.name || '';
+  els.patientCode.value = p.code || '';
+  els.patientPhone.value = p.phone || '';
+  els.patientTotal.value = p.total || 13;
+  els.patientNote.value = p.note || '';
+  renderPatients();
+  renderStats();
+}
+
+function savePatient(){
+  const name = els.patientName.value.trim();
+  if(!name) return alert('請先輸入病患姓名');
+  const current = selectedPatient();
+  const payload = { id:selectedPatientId || uid(), name, code:els.patientCode.value.trim(), phone:els.patientPhone.value.trim(), total:Math.max(parseInt(els.patientTotal.value||'0',10),0), note:els.patientNote.value.trim(), taken:current?.taken || 0 };
+  if(selectedPatientId){
+    patients = patients.map(p => p.id===selectedPatientId ? { ...p, ...payload, taken: Math.min(p.taken || 0, payload.total) } : p);
+  } else {
+    patients.unshift(payload); selectedPatientId = payload.id;
+  }
+  persist(); renderPatients(); renderStats(); alert('病患資料已儲存');
+}
+
+function deletePatient(){
+  const p = selectedPatient();
+  if(!p) return alert('請先選擇要刪除的病患');
+  if(!confirm(`確定要刪除 ${p.name} 嗎？`)) return;
+  patients = patients.filter(x => x.id !== p.id);
+  records = records.filter(r => r.patientId !== p.id);
+  selectedPatientId = patients[0]?.id || null;
+  if(selectedPatientId) selectPatient(selectedPatientId); else { clearPatientForm(); renderPatients(); renderStats(); }
+  persist(); renderRecords(); alert('病患與其領取紀錄已刪除');
+}
+
+async function savePickup(){
+  const p = selectedPatient();
+  if(!p) return alert('請先選擇或新增病患');
+  const qty = Math.max(parseInt(els.pickupQty.value || '0',10),0);
+  if(!qty) return alert('請輸入本次領取盒數');
+  const remain = Math.max((p.total||0)-(p.taken||0),0);
+  if(qty > remain) return alert(`剩餘只有 ${remain} 盒，不能超過剩餘盒數`);
+  if(signaturePad.isEmpty()) return alert('請先簽名');
+
+  const record = {
+    id:uid(), patientId:p.id, patientName:p.name, patientCode:p.code || '', patientPhone:p.phone || '',
+    date:els.pickupDate.value || today(), qty, signer:els.signer.value.trim(), remark:els.pickupRemark.value.trim(),
+    signature:signaturePad.toDataURL(), synced:false, createdAt:new Date().toISOString()
+  };
+  records.unshift(record);
+  patients = patients.map(x => x.id===p.id ? { ...x, taken:(x.taken||0)+qty } : x);
+  persist(); renderPatients(); renderStats(); renderRecords();
+  els.pickupQty.value='1'; els.signer.value=''; els.pickupRemark.value=''; signaturePad.clear(); setActiveQuickButton(null);
+  alert('領取紀錄已存檔');
+  if(settings.scriptUrl){ await syncPendingRecords(false); }
+}
+
+function exportJson(){
+  downloadFile(JSON.stringify({ settings, patients, records, exportedAt:new Date().toISOString() }, null, 2), `clinic-formal-backup-${today()}.json`, 'application/json');
+}
+function exportCsv(){
+  const headers = ['日期','病患姓名','病歷號','電話','領取盒數','簽名人','備註','同步狀態'];
+  const rows = records.map(r => [r.date,r.patientName,r.patientCode,r.patientPhone,r.qty,r.signer,r.remark,r.synced?'已同步':'待同步']);
+  const csv = [headers, ...rows].map(row => row.map(v => `"${String(v ?? '').replaceAll('"','""')}"`).join(',')).join('\n');
+  downloadFile('\ufeff'+csv, `clinic-records-${today()}.csv`, 'text/csv;charset=utf-8;');
+}
+function downloadFile(content, filename, mime){
+  const blob = new Blob([content], { type:mime });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob); a.download = filename; a.click(); setTimeout(()=>URL.revokeObjectURL(a.href), 1000);
+}
+function clearRecords(){
+  if(!confirm('確定要清空全部領取紀錄嗎？')) return;
+  records = []; patients = patients.map(p => ({...p, taken:0})); persist(); renderPatients(); renderStats(); renderRecords();
+}
+function printPatient(){
+  const p = selectedPatient();
+  if(!p) return alert('請先選擇病患');
+  const list = records.filter(r => r.patientId===p.id).sort((a,b)=>(a.date||'').localeCompare(b.date||''));
+  const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>${escapeHtml(settings.clinicName)}-${escapeHtml(p.name)}</title><style>body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Noto Sans TC',sans-serif;padding:24px;color:#111827}h1{margin-bottom:6px}table{width:100%;border-collapse:collapse;margin-top:18px}th,td{border:1px solid #d1d5db;padding:8px;text-align:left;font-size:13px}th{background:#f3f4f6}</style></head><body><h1>${escapeHtml(settings.clinicName)}</h1><div>病患：${escapeHtml(p.name)}　病歷號：${escapeHtml(p.code||'')}</div><div>電話：${escapeHtml(p.phone||'')}　總盒數：${p.total||0}　已領取：${p.taken||0}　剩餘：${Math.max((p.total||0)-(p.taken||0),0)}</div><table><thead><tr><th>日期</th><th>領取盒數</th><th>簽名人</th><th>備註</th></tr></thead><tbody>${list.map(r=>`<tr><td>${escapeHtml(r.date||'')}</td><td>${escapeHtml(String(r.qty||0))}</td><td>${escapeHtml(r.signer||'')}</td><td>${escapeHtml(r.remark||'')}</td></tr>`).join('')}</tbody></table></body></html>`;
+  const win = window.open('', '_blank'); if(!win) return alert('無法開啟列印視窗'); win.document.write(html); win.document.close(); win.focus(); win.print();
+}
+
+function setActiveQuickButton(val){ document.querySelectorAll('#quickQtyBtns .btn-chip').forEach(btn => btn.classList.toggle('active', btn.dataset.qty === String(val))); }
+document.querySelectorAll('#quickQtyBtns .btn-chip').forEach(btn => btn.onclick = () => {
+  const p = selectedPatient(); const val = btn.dataset.qty;
+  if(val === 'all'){ const remain = p ? Math.max((p.total||0)-(p.taken||0),0) : 0; els.pickupQty.value = remain || 1; }
+  else els.pickupQty.value = val;
+  setActiveQuickButton(val);
+});
+
+class SimpleSignaturePad {
+  constructor(canvas){ this.canvas = canvas; this.ctx = canvas.getContext('2d'); this.empty = true; this.drawing = false; this.resize(); this.ctx.lineWidth = 2.4; this.ctx.lineCap='round'; this.ctx.lineJoin='round'; this.ctx.strokeStyle='#0f172a'; this.bind(); }
+  resize(){ const ratio = Math.max(window.devicePixelRatio || 1, 1); const rect = this.canvas.getBoundingClientRect(); let data = null; const had = !this.empty; if(had){ try { data = this.canvas.toDataURL(); } catch {} } this.canvas.width = rect.width * ratio; this.canvas.height = rect.height * ratio; this.ctx.setTransform(ratio,0,0,ratio,0,0); this.ctx.lineWidth = 2.4; this.ctx.lineCap='round'; this.ctx.lineJoin='round'; this.ctx.strokeStyle='#0f172a'; if(data){ const img = new Image(); img.onload = ()=> this.ctx.drawImage(img,0,0,rect.width,rect.height); img.src = data; } else { this.clear(); } }
+  bind(){ const start = e => { e.preventDefault(); const p = this.point(e); this.drawing=true; this.empty=false; this.ctx.beginPath(); this.ctx.moveTo(p.x,p.y); }; const move = e => { if(!this.drawing) return; e.preventDefault(); const p = this.point(e); this.ctx.lineTo(p.x,p.y); this.ctx.stroke(); }; const end = e => { if(this.drawing){ e.preventDefault(); this.drawing=false; } }; this.canvas.addEventListener('pointerdown', start); this.canvas.addEventListener('pointermove', move); window.addEventListener('pointerup', end); window.addEventListener('resize', ()=>this.resize()); }
+  point(e){ const r = this.canvas.getBoundingClientRect(); return { x:e.clientX-r.left, y:e.clientY-r.top }; }
+  clear(){ const r = this.canvas.getBoundingClientRect(); this.ctx.clearRect(0,0,r.width,r.height); this.empty=true; }
+  isEmpty(){ return this.empty; }
+  toDataURL(){ return this.canvas.toDataURL('image/png'); }
+}
+const signaturePad = new SimpleSignaturePad($('signatureCanvas'));
+
+async function postJson(url, payload){
+  const res = await fetch(url, { method:'POST', headers:{ 'Content-Type':'text/plain;charset=utf-8' }, body:JSON.stringify(payload) });
+  const text = await res.text();
+  try { return JSON.parse(text); } catch { return { ok:res.ok, raw:text }; }
+}
+
+async function syncPendingRecords(showSuccess=true){
+  if(!settings.scriptUrl) return alert('請先在系統設定貼上 Apps Script 網址');
+  const pending = records.filter(r => !r.synced);
+  if(!pending.length){ if(showSuccess) alert('目前沒有待同步紀錄'); updateSyncStatus(); return; }
+  let success = 0, fail = 0;
+  for(const rec of pending){
+    try{
+      const result = await postJson(settings.scriptUrl, { action:'append_record', clinicName:settings.clinicName, sheetId:settings.sheetId, record:rec });
+      if(result && result.ok){ rec.synced = true; success += 1; } else { fail += 1; }
+    } catch { fail += 1; }
+  }
+  persist(); renderRecords();
+  if(showSuccess || fail){ alert(`同步完成：成功 ${success} 筆，失敗 ${fail} 筆`); }
+}
+
+async function testSync(){
+  if(!settings.scriptUrl) return alert('請先輸入 Apps Script 網址');
+  try{
+    const result = await postJson(settings.scriptUrl, { action:'test', clinicName:settings.clinicName, sheetId:settings.sheetId });
+    alert(result && result.ok ? '測試成功，雲端同步可用' : '測試失敗，請檢查 Apps Script 設定');
+  } catch {
+    alert('測試失敗，請檢查網址與部署權限');
+  }
+}
+
+function seedIfEmpty(){
+  if(patients.length) { selectedPatientId = patients[0].id; return; }
+  const demo = { id:uid(), name:'範例病患', code:'A001', phone:'0912-345-678', total:13, taken:0, note:'可自行修改或刪除' };
+  patients.push(demo); selectedPatientId = demo.id; persist();
+}
+
+$('addPatientBtn').onclick = () => { selectedPatientId = null; clearPatientForm(); renderPatients(); renderStats(); };
+$('savePatientBtn').onclick = savePatient;
+$('resetPatientBtn').onclick = clearPatientForm;
+$('deletePatientBtn').onclick = deletePatient;
+$('savePickupBtn').onclick = savePickup;
+$('clearSignBtn').onclick = () => signaturePad.clear();
+$('searchInput').oninput = renderPatients;
+$('exportJsonBtn').onclick = exportJson;
+$('exportCsvBtn').onclick = exportCsv;
+$('clearRecordsBtn').onclick = clearRecords;
+$('printPatientBtn').onclick = printPatient;
+$('openSettingsBtn').onclick = () => $('settingsModal').classList.add('show');
+$('closeSettingsBtn').onclick = () => $('settingsModal').classList.remove('show');
+$('syncNowBtn').onclick = () => syncPendingRecords(true);
+$('testSyncBtn').onclick = testSync;
+$('saveSettingsBtn').onclick = () => {
+  settings = { clinicName:$('clinicNameInput').value.trim() || '診所', scriptUrl:$('scriptUrlInput').value.trim(), sheetId:$('sheetIdInput').value.trim() };
+  persist(); applySettingsToUi(); $('settingsModal').classList.remove('show'); alert('系統設定已儲存');
+};
+window.addEventListener('click', e => { if(e.target === $('settingsModal')) $('settingsModal').classList.remove('show'); });
+
+seedIfEmpty();
+applySettingsToUi();
+selectPatient(selectedPatientId);
+renderPatients();
+renderStats();
+renderRecords();
+</script>
+</body>
+</html>
